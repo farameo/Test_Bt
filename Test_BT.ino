@@ -3,7 +3,6 @@
 
 #define BT_RX 11
 #define BT_TX 10
-#define BTVCC 9
 
 #define led1 3
 #define led2 5
@@ -19,6 +18,8 @@ void setup() {
   Bluetooth.begin(9600); 
 
   pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
 
 
 }
@@ -34,6 +35,12 @@ void loop(){
     
     if (comando.indexOf("led1") >= 0) {
         analogWrite(led1, 255);
+    }
+    if (comando.indexOf("led2") >= 0) {
+        analogWrite(led2, 255);
+    }
+    if (comando.indexOf("led3") >= 0) {
+        analogWrite(led3, 255);
     }
   }
   
