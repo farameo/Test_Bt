@@ -13,15 +13,12 @@ SoftwareSerial Bluetooth(BT_RX, BT_TX); // RX, TX
 String comando;
 
 int rxState;
-int rxLen;
 int rxCmd;
 
 int _BYTE = -86;
-int _CMD = 1;
 
 const int _rxState = 0;
-const int _rxSync  = 1;
-const int _rxCmd = 2;
+const int _rxCmd = 1;
 const int _rxData = 3;
 
 
@@ -51,43 +48,30 @@ void loop(){
   while (Bluetooth.available()) {
     
     char rxDato = (int)Bluetooth.read();
-    Serial.println(rxDato, DEC);
     
     switch (rxState) {
       
       case _rxState:
         if (rxDato == _BYTE) {
-          Serial.println("byte de inicio"); 
-          rxState = _rxSync; 
+          rxState = _rxCmd; 
         }
-        break;
-
-      case _rxSync:
-        rxLen = rxDato;
-        Serial.println("longitud : " + String(rxLen));
-        rxLen--;
-        rxState = _rxCmd;
-               
         break;
 
       case _rxCmd:
         rxCmd = rxDato;
-        Serial.println("comando: " + String(rxCmd));
-        rxLen--;
         rxState = _rxData;
         break;
 
       case _rxData:
-        Serial.println(rxDato, DEC);
-
-        if (rxCmd == _CMD) {
+        if (rxCmd == 1) {
           analogWrite(led1, rxDato);
+        } else if (rxCmd == 2) {
+          analogWrite(led2, rxDato);
+        } else {
+          analogWrite(led3, rxDato);
         }
         
-        rxLen--;
-        if (rxLen == 0 ) {
-          rxState = _rxState;
-        }
+        rxState = _rxState;
 
         break;
         
