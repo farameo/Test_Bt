@@ -37,14 +37,7 @@ void setup() {
 }
 
 void loop(){
-    /*
-    comando = "";
-    while (Bluetooth.available()) {
-      char caracter = Bluetooth.read();
-      comando += caracter;
-      delay(10);
-    }
-    */
+ 
   while (Bluetooth.available()) {
     
     char rxDato = (int)Bluetooth.read();
