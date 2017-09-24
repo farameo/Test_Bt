@@ -12,6 +12,19 @@ SoftwareSerial Bluetooth(BT_RX, BT_TX); // RX, TX
 
 String comando;
 
+int rxState;
+int rxLen;
+int rxCmd;
+
+int _BYTE = -86;
+int _CMD = 1;
+
+const int _rxState = 0;
+const int _rxSync  = 1;
+const int _rxCmd = 2;
+const int _rxData = 3;
+
+
 void setup() {
   Serial.begin(9600);
 
@@ -20,28 +33,70 @@ void setup() {
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
-
+  
+  Serial.println("esperando");
+  rxState = _rxState;
 
 }
 
 void loop(){
-  if (Bluetooth.available()) {
-    Serial.println("a");
+    /*
+    comando = "";
     while (Bluetooth.available()) {
       char caracter = Bluetooth.read();
       comando += caracter;
       delay(10);
     }
+    */
+  while (Bluetooth.available()) {
     
-    if (comando.indexOf("led1") >= 0) {
-        analogWrite(led1, 255);
+    char rxDato = (int)Bluetooth.read();
+    Serial.println(rxDato, DEC);
+    
+    switch (rxState) {
+      
+      case _rxState:
+        if (rxDato == _BYTE) {
+          Serial.println("byte de inicio"); 
+          rxState = _rxSync; 
+        }
+        break;
+
+      case _rxSync:
+        rxLen = rxDato;
+        Serial.println("longitud : " + String(rxLen));
+        rxLen--;
+        rxState = _rxCmd;
+               
+        break;
+
+      case _rxCmd:
+        rxCmd = rxDato;
+        Serial.println("comando: " + String(rxCmd));
+        rxLen--;
+        rxState = _rxData;
+        break;
+
+      case _rxData:
+        Serial.println(rxDato, DEC);
+
+        if (rxCmd == _CMD) {
+          analogWrite(led1, rxDato);
+        }
+        
+        rxLen--;
+        if (rxLen == 0 ) {
+          rxState = _rxState;
+        }
+
+        break;
+        
+
+      default:
+       rxState = _rxState;
     }
-    if (comando.indexOf("led2") >= 0) {
-        analogWrite(led2, 255);
-    }
-    if (comando.indexOf("led3") >= 0) {
-        analogWrite(led3, 255);
-    }
+   
+ 
   }
   
 }
